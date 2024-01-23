@@ -8,6 +8,7 @@ import com.kotlinspring.crudkotlinpoc.repository.StackRepository
 import com.kotlinspring.crudkotlinpoc.repository.UserRepository
 import jakarta.transaction.Transactional
 import mu.KLogging
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,8 +16,9 @@ class UserService (private val userRepository: UserRepository, private val stack
 
     companion object : KLogging()
 
-    fun findAll(): List<UserDTO> = userRepository
-        .findAll()
+    fun findAll(page: Int, size: Int): List<UserDTO> = userRepository
+        .findAll(PageRequest.of(if (page >= 2) page - 1 else 0, size))
+        .toList()
         .map { user ->
             val stack = user.id?.let { stackRepository.findByUserId(it).map { st -> st.name} }
 

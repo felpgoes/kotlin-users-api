@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -23,7 +24,10 @@ class UserController(private val userService: UserService) {
     fun find(@PathVariable("id") userId: String) = userService.find(userId)
 
     @GetMapping
-    fun list() = userService.findAll()
+    fun list(
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestParam(defaultValue = "5") size: Int
+    ) = userService.findAll(page, size)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
