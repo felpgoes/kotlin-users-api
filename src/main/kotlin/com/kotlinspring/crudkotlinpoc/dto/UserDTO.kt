@@ -15,7 +15,7 @@ data class UserDTO (
     @get:Length(max = 255, message = "O campo não pode exceder 255 caracteres")
     val name: String,
 
-  val birth_date: LocalDateTime, // 2024-01-16T21:56:05.197Z
+    val birth_date: LocalDateTime, // 2024-01-16T21:56:05.197Z
 
     @ValidStackList
     val stack: List<String>?

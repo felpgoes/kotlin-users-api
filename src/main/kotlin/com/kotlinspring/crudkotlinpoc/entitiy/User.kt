@@ -9,8 +9,13 @@ data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String?,
+
     var nick: String?,
+
+    @Column(unique = true, nullable = false)
     var name: String,
+
+    @Column(nullable = false)
     var birthDate: LocalDateTime,
 
     @OneToMany(
