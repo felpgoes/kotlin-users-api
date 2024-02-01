@@ -27,7 +27,10 @@ class UserController(private val userService: UserService) {
     fun list(
         @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "5") size: Int
-    ) = userService.findAll(page, size)
+    ) = run {
+        val users = userService.findAll(page, size)
+        mapOf("content" to users, "page" to page, "size" to size, "quantity" to users.size)
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
