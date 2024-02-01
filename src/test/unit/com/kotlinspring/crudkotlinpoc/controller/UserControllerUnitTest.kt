@@ -48,7 +48,7 @@ class UserControllerUnitTest {
     fun shouldNotStoreUserWithNickValidationError() {
         val userDTO = UserDTO(
             null,
-            "vapovapovapovapovapovapovapovapovapovapovapovapovapovapo",
+            "vapo".repeat(10),
             "Felipe",
             validBirthDate,
             listOf("NodeJS", "JS")
