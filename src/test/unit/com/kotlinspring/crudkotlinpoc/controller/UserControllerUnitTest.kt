@@ -6,7 +6,8 @@ import com.kotlinspring.crudkotlinpoc.exceptions.UserNotFoundException
 import com.kotlinspring.crudkotlinpoc.service.UserService
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -14,9 +15,11 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
 import org.springframework.http.RequestEntity
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("dev")
 class UserControllerUnitTest {
     private val baseUrl = "/users"
 
@@ -33,12 +36,12 @@ class UserControllerUnitTest {
         val userDTO = UserDTO(null, "v", "Felipe", validBirthDate, listOf("NodeJS", "JS"))
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
-        val savedCourseDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
+        val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
 
-        Assertions.assertNotNull(savedCourseDTO)
-        Assertions.assertEquals(savedCourseDTO::class, UserDTO::class)
-        Assertions.assertEquals(savedCourseDTO.name, userDTO.name)
-        Assertions.assertEquals(savedCourseDTO.id, "aaa")
+        assertNotNull(savedUserDTO)
+        assertEquals(savedUserDTO::class, UserDTO::class)
+        assertEquals(savedUserDTO.name, userDTO.name)
+        assertEquals(savedUserDTO.id, "aaa")
     }
 
     @Test
@@ -53,19 +56,19 @@ class UserControllerUnitTest {
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
 
-        val savedCourseDTO = testRestTemplate.exchange(
+        val savedUserDTO = testRestTemplate.exchange(
             RequestEntity.post(baseUrl).body(userDTO),
             object: ParameterizedTypeReference<List<GenericHandler.InvalidFieldResponse>>() {}
         )
 
-        Assertions.assertNotNull(savedCourseDTO.body)
-        Assertions.assertEquals(savedCourseDTO.statusCode, HttpStatus.BAD_REQUEST)
+        assertNotNull(savedUserDTO.body)
+        assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-        Assertions.assertEquals(savedCourseDTO.body!!.size, 1)
+        assertEquals(savedUserDTO.body!!.size, 1)
 
-        val error = savedCourseDTO.body!!.first()
-        Assertions.assertEquals(error.campo, "Length.nick")
-        Assertions.assertEquals(error.message, "O campo não pode exceder 32 caracteres")
+        val error = savedUserDTO.body!!.first()
+        assertEquals(error.campo, "Length.nick")
+        assertEquals(error.message, "O campo não pode exceder 32 caracteres")
     }
 
     @Test
@@ -80,19 +83,19 @@ class UserControllerUnitTest {
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
 
-        val savedCourseDTO = testRestTemplate.exchange(
+        val savedUserDTO = testRestTemplate.exchange(
             RequestEntity.post(baseUrl).body(userDTO),
             object: ParameterizedTypeReference<List<GenericHandler.InvalidFieldResponse>>() {}
         )
 
-        Assertions.assertNotNull(savedCourseDTO.body)
-        Assertions.assertEquals(savedCourseDTO.statusCode, HttpStatus.BAD_REQUEST)
+        assertNotNull(savedUserDTO.body)
+        assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-        Assertions.assertEquals(savedCourseDTO.body!!.size, 1)
+        assertEquals(savedUserDTO.body!!.size, 1)
 
-        val error = savedCourseDTO.body!!.first()
-        Assertions.assertEquals(error.campo, "Length.name")
-        Assertions.assertEquals(error.message, "O campo não pode exceder 255 caracteres")
+        val error = savedUserDTO.body!!.first()
+        assertEquals(error.campo, "Length.name")
+        assertEquals(error.message, "O campo não pode exceder 255 caracteres")
     }
 
     @Test
@@ -107,19 +110,19 @@ class UserControllerUnitTest {
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
 
-        val savedCourseDTO = testRestTemplate.exchange(
+        val savedUserDTO = testRestTemplate.exchange(
             RequestEntity.post(baseUrl).body(userDTO),
             object: ParameterizedTypeReference<List<GenericHandler.InvalidFieldResponse>>() {}
         )
 
-        Assertions.assertNotNull(savedCourseDTO.body)
-        Assertions.assertEquals(savedCourseDTO.statusCode, HttpStatus.BAD_REQUEST)
+        assertNotNull(savedUserDTO.body)
+        assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-        Assertions.assertEquals(savedCourseDTO.body!!.size, 1)
+        assertEquals(savedUserDTO.body!!.size, 1)
 
-        val error = savedCourseDTO.body!!.first()
-        Assertions.assertEquals(error.campo, "NotBlank.name")
-        Assertions.assertEquals(error.message, "O campo não pode ser vazio")
+        val error = savedUserDTO.body!!.first()
+        assertEquals(error.campo, "NotBlank.name")
+        assertEquals(error.message, "O campo não pode ser vazio")
     }
 
     @Test
@@ -134,9 +137,9 @@ class UserControllerUnitTest {
             "stack" to listOf("NodeJS", "JS")
         )
 
-        val savedCourseDTO = testRestTemplate.postForObject(baseUrl, userDTO, String::class.java)
+        val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, String::class.java)
 
-        Assertions.assertEquals(savedCourseDTO, "O valor \"$invalidBirthDate\" não é um tipo de Data valido.")
+        assertEquals(savedUserDTO, "O valor \"$invalidBirthDate\" não é um tipo de Data valido.")
     }
 
     @Test
@@ -151,19 +154,19 @@ class UserControllerUnitTest {
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
 
-        val savedCourseDTO = testRestTemplate.exchange(
+        val savedUserDTO = testRestTemplate.exchange(
             RequestEntity.post(baseUrl).body(userDTO),
             object: ParameterizedTypeReference<List<GenericHandler.InvalidFieldResponse>>() {}
         )
 
-        Assertions.assertNotNull(savedCourseDTO.body)
-        Assertions.assertEquals(savedCourseDTO.statusCode, HttpStatus.BAD_REQUEST)
+        assertNotNull(savedUserDTO.body)
+        assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-        Assertions.assertEquals(savedCourseDTO.body!!.size, 1)
+        assertEquals(savedUserDTO.body!!.size, 1)
 
-        val error = savedCourseDTO.body!!.first()
-        Assertions.assertEquals(error.campo, "ValidStackList.stack")
-        Assertions.assertEquals(error.message, "Invalid Stack List")
+        val error = savedUserDTO.body!!.first()
+        assertEquals(error.campo, "ValidStackList.stack")
+        assertEquals(error.message, "Invalid Stack List")
     }
 
     @Test
@@ -172,14 +175,14 @@ class UserControllerUnitTest {
 
         every { userServiceMock.find(any()) } returns userDTO
 
-        val savedCourseDTO = testRestTemplate.getForEntity("$baseUrl/ID_LEGAL_123", UserDTO::class.java)
+        val savedUserDTO = testRestTemplate.getForEntity("$baseUrl/ID_LEGAL_123", UserDTO::class.java)
 
-        Assertions.assertNotNull(savedCourseDTO.body)
-        Assertions.assertEquals(savedCourseDTO.statusCode, HttpStatus.OK)
+        assertNotNull(savedUserDTO.body)
+        assertEquals(savedUserDTO.statusCode, HttpStatus.OK)
 
 
-        Assertions.assertEquals(savedCourseDTO.body!!.id, "ID_LEGAL_123")
-        Assertions.assertEquals(userDTO, savedCourseDTO.body)
+        assertEquals(savedUserDTO.body!!.id, "ID_LEGAL_123")
+        assertEquals(userDTO, savedUserDTO.body)
     }
 
     @Test
@@ -188,10 +191,10 @@ class UserControllerUnitTest {
 
         every { userServiceMock.find(any()) } throws UserNotFoundException(userId)
 
-        val savedCourseDTO = testRestTemplate.getForEntity("$baseUrl/$userId", String::class.java)
+        val savedUserDTO = testRestTemplate.getForEntity("$baseUrl/$userId", String::class.java)
 
-        Assertions.assertNotNull(savedCourseDTO.body)
-        Assertions.assertEquals(savedCourseDTO.statusCode, HttpStatus.NOT_FOUND)
-        Assertions.assertEquals("User not found with id: $userId", savedCourseDTO.body)
+        assertNotNull(savedUserDTO.body)
+        assertEquals(savedUserDTO.statusCode, HttpStatus.NOT_FOUND)
+        assertEquals("User not found with id: $userId", savedUserDTO.body)
     }
 }
