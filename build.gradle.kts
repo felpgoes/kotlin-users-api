@@ -28,8 +28,7 @@ dependencies {
 
 	implementation("io.github.microutils:kotlin-logging-jvm:2.0.11")
 
-//	runtimeOnly("com.h2database:h2")
-//	runtimeOnly("org.postgresql:postgresql")
+	runtimeOnly("com.h2database:h2")
 	runtimeOnly("com.oracle.database.jdbc:ojdbc11")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -37,6 +36,9 @@ dependencies {
 
 	testImplementation("io.mockk:mockk:1.10.4")
 	testImplementation("com.ninja-squad:springmockk:3.0.1")
+
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:oracle-xe:1.19.4")
 }
 
 tasks.withType<KotlinCompile> {
