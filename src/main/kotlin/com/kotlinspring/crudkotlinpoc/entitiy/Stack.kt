@@ -8,7 +8,10 @@ data class Stack(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String?,
+
+    @Column(length = 32)
     val name: String,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     val user: User?
