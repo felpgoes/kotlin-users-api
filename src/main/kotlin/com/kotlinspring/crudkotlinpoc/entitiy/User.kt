@@ -26,6 +26,6 @@ data class User(
     var stack: List<Stack>? = mutableListOf()
 ) {
     override fun toString(): String {
-        return "[id=$id, name=$name, birth_date=$birthDate, stack=${stack?.joinToString { it.name }}]"
+        return "[id=$id, name=$name, birthDate=$birthDate, stack=${stack?.joinToString { it.name }}]"
     }
 }

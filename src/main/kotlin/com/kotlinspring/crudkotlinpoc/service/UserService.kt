@@ -52,7 +52,7 @@ class UserService (private val userRepository: UserRepository, private val stack
 
     fun create(body: UserDTO): UserDTO {
         val savedUser = userRepository.save(
-            User(null,  body.nick, body.name, body.birth_date)
+            User(null,  body.nick, body.name, body.birthDate)
         )
 
         val stack = body.stack!!.map { stack -> Stack(null, stack, savedUser) }
@@ -76,7 +76,7 @@ class UserService (private val userRepository: UserRepository, private val stack
             .let {
                 it.name = body.name
                 it.nick = body.nick
-                it.birthDate = body.birth_date
+                it.birthDate = body.birthDate
                 logger.info("body=$body")
                 val updatedUser = userRepository.save(it)
                 logger.info("updatedUser=$updatedUser")
