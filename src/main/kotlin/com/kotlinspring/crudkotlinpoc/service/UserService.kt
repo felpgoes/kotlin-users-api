@@ -1,5 +1,6 @@
 package com.kotlinspring.crudkotlinpoc.service
 
+import com.kotlinspring.crudkotlinpoc.dto.StackDTO
 import com.kotlinspring.crudkotlinpoc.dto.UserDTO
 import com.kotlinspring.crudkotlinpoc.entitiy.Stack
 import com.kotlinspring.crudkotlinpoc.entitiy.User
@@ -20,7 +21,7 @@ class UserService (private val userRepository: UserRepository, private val stack
         .findAll(PageRequest.of(if (page >= 2) page - 1 else 0, size))
         .toList()
         .map { user ->
-            val stack = user.id?.let { stackRepository.findByUserId(it).map { st -> st.name} }
+            val stack = user.id?.let { stackRepository.findByUserId(it).map { st -> StackDTO(st.name, st.score)} }
 
             UserDTO(user.id, user.nick, user.name, user.birthDate, stack)
         }
@@ -34,7 +35,7 @@ class UserService (private val userRepository: UserRepository, private val stack
         }
 
         return user.get().let {
-            val stack = stackRepository.findByUserId(userId).map { st -> st.name}
+            val stack = stackRepository.findByUserId(userId).map { st -> StackDTO(st.name, st.score)}
 
             UserDTO(it.id,it.nick,it.name, it.birthDate, stack)
         }
@@ -55,7 +56,7 @@ class UserService (private val userRepository: UserRepository, private val stack
             User(null,  body.nick, body.name, body.birthDate)
         )
 
-        val stack = body.stack!!.map { stack -> Stack(null, stack, savedUser) }
+        val stack = body.stackDTO!!.map { stack -> Stack(null, stack.name, stack.score, savedUser) }
 
         stack.let {
             stackRepository.saveAll(stack)
@@ -82,13 +83,17 @@ class UserService (private val userRepository: UserRepository, private val stack
                 logger.info("updatedUser=$updatedUser")
 
                 stackRepository.deleteAllByUserId(userId)
-                val stack = body.stack!!.map { stack -> Stack(null, stack, updatedUser) }
+                val stack = body.stackDTO!!.map { stack -> Stack(null, stack.name, stack.score, updatedUser) }
                 logger.info("stack=$stack")
 
                 stackRepository.saveAll(stack)
 
-                UserDTO(it.id, it.nick, it.name,  it.birthDate, body.stack)
+                UserDTO(it.id, it.nick, it.name,  it.birthDate, body.stackDTO)
             }
 
+    }
+
+    fun findStacks(userId: String): List<StackDTO> {
+        return stackRepository.findByUserId(userId).map { StackDTO(it.name, it.score) }
     }
 }

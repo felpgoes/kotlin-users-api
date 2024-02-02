@@ -12,6 +12,9 @@ data class Stack(
     @Column(length = 32)
     val name: String,
 
+    @Column(nullable = false)
+    val score: Int,
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     val user: User?

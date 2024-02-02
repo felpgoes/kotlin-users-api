@@ -14,6 +14,9 @@ class UserController(private val userService: UserService) {
     @GetMapping("/{id}")
     fun find(@PathVariable("id") userId: String) = userService.find(userId)
 
+    @GetMapping("/{id}/stack")
+    fun findStacks(@PathVariable("id") userId: String) = userService.findStacks(userId)
+
     @GetMapping
     fun list(
         @RequestParam(defaultValue = "1") page: Int,

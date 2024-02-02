@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 
+
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class UserDTO (
     var id: String?,
@@ -21,9 +22,9 @@ data class UserDTO (
     val birthDate: LocalDateTime, // 2024-01-16T21:56:05.197Z
 
     @ValidStackList
-    val stack: List<String>?
+    val stackDTO: List<StackDTO>?
 ) {
     override fun toString(): String {
-        return "[id=$id, name=$name, birthDate=$birthDate, stack=${stack?.joinToString { it }}]"
+        return "[id=$id, name=$name, birthDate=$birthDate, stack=${stackDTO?.joinToString { "[name=${it.name}, score=${it.score}]" }} ]"
     }
 }
