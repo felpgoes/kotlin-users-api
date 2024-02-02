@@ -3,7 +3,7 @@ package com.kotlinspring.crudkotlinpoc.dto
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import com.kotlinspring.crudkotlinpoc.decorators.ValidStackList
-import jakarta.validation.constraints.*
+import jakarta.validation.constraints.NotBlank
 import org.hibernate.validator.constraints.Length
 import java.time.LocalDateTime
 
