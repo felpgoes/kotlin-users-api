@@ -1,5 +1,6 @@
 package com.kotlinspring.crudkotlinpoc.controller
 
+import com.kotlinspring.crudkotlinpoc.dto.StackDTO
 import com.kotlinspring.crudkotlinpoc.dto.UserDTO
 import com.kotlinspring.crudkotlinpoc.exceptions.UserNotFoundException
 import com.kotlinspring.crudkotlinpoc.service.UserService
@@ -26,7 +27,13 @@ class UserControllerUnitTest {
 
     @Test
     fun shouldStoreUserWithSuccess() {
-        val userDTO = UserDTO(null, "v", "Felipe", validBirthDate, listOf("NodeJS", "JS"))
+        val userDTO = UserDTO(
+            null,
+            "v",
+            "Felipe",
+            validBirthDate,
+            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
+        )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
         val savedUserDTO = userController.store(userDTO)
@@ -44,7 +51,7 @@ class UserControllerUnitTest {
             "vapo".repeat(10),
             "Felipe",
             validBirthDate,
-            listOf("NodeJS", "JS")
+            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -65,7 +72,7 @@ class UserControllerUnitTest {
             "V",
             "Felipe".repeat(50),
             validBirthDate,
-            listOf("NodeJS", "JS")
+            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -86,7 +93,7 @@ class UserControllerUnitTest {
             "V",
             "",
             validBirthDate,
-            listOf("NodeJS", "JS")
+            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -108,7 +115,7 @@ class UserControllerUnitTest {
             "V",
             "Felipe",
             validBirthDate,
-            listOf("NodeJS", "")
+            listOf(StackDTO("NodeJS", 77), StackDTO("", 1))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -118,14 +125,55 @@ class UserControllerUnitTest {
 
         assertNotNull(error)
         assertEquals(error.constraintDescriptor.annotation.annotationClass.toString(), "class com.kotlinspring.crudkotlinpoc.decorators.ValidStackList")
-        assertEquals(error.propertyPath.toString(), "store.body.stack")
+        assertEquals(error.propertyPath.toString(), "store.body.stackDTO")
         assertEquals(error.message, "Invalid Stack List")
     }
 
     @Test
+    fun shouldNotStoreUserWithScoreGreaterThen100StackValidationError() {
+        val userDTO = UserDTO(
+            null,
+            "V",
+            "Felipe",
+            validBirthDate,
+            listOf(StackDTO("NodeJS", 77), StackDTO("Swift", 999))
+        )
+
+        every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
+
+        val rawError = assertThrows<ConstraintViolationException> { userController.store(userDTO) }
+        val error = rawError.constraintViolations.first()
+
+        assertNotNull(error)
+        assertEquals(error.constraintDescriptor.annotation.annotationClass.toString(), "class com.kotlinspring.crudkotlinpoc.decorators.ValidStackList")
+        assertEquals(error.propertyPath.toString(), "store.body.stackDTO")
+        assertEquals(error.message, "Invalid Stack List")
+    }
+
+    @Test
+    fun shouldNotStoreUserWithScoreLowerThen1StackValidationError() {
+        val userDTO = UserDTO(
+            null,
+            "V",
+            "Felipe",
+            validBirthDate,
+            listOf(StackDTO("NodeJS", 0))
+        )
+
+        every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
+
+        val rawError = assertThrows<ConstraintViolationException> { userController.store(userDTO) }
+        val error = rawError.constraintViolations.first()
+
+        assertNotNull(error)
+        assertEquals(error.constraintDescriptor.annotation.annotationClass.toString(), "class com.kotlinspring.crudkotlinpoc.decorators.ValidStackList")
+        assertEquals(error.propertyPath.toString(), "store.body.stackDTO")
+        assertEquals(error.message, "Invalid Stack List")
+    }
+    @Test
     fun shouldRetrieveUserWithSuccess() {
         val id = "ID_LEGAL_123"
-        val userDTO = UserDTO(id, "v", "Felipe", validBirthDate, listOf("NodeJS", "JS"))
+        val userDTO = UserDTO(id, "v", "Felipe", validBirthDate, listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100)))
 
         every { userServiceMock.find(any()) } returns userDTO
 
