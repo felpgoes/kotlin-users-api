@@ -27,7 +27,7 @@ docker container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcom
 - [x] Desenvolver Tests
 
 ## Etapa 2
-- [ ] Adicionar paginação e ordenação na listagem de usuários
+- [x] Adicionar paginação e ordenação na listagem de usuários
 - [x] Padronizar as mensagens de erros
 - [x] Adicionar o campo level na lista de tecnologias
 - [x] Alterar todos os endpoints para retornar o novo campo level
