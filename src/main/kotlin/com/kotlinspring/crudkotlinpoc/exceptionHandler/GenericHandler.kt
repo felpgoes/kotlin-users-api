@@ -27,13 +27,17 @@ class GenericHandler {
         Exception,
     }
 
+    data class ErrorResponse (
+        val errorMessages: List<ErrorMessage>
+    )
+
     data class ErrorMessage (
         val code: ErrorsCodesEnum,
         val description: String
     )
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handle(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<List<ErrorMessage>> {
+    fun handle(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Method Argument Not Valid Exception Exception observed: ${ex.message}", ex)
 
         val errors = ex.bindingResult.allErrors
@@ -44,14 +48,18 @@ class GenericHandler {
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(errors)
+            .body(ErrorResponse(errors))
     }
 
     @ExceptionHandler(DateTimeParseException::class)
-    fun handle(ex: DateTimeParseException, request: WebRequest): ResponseEntity<List<ErrorMessage>> {
+    fun handle(ex: DateTimeParseException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("DateTime Parse Exception observed: ${ex.parsedString}", ex)
 
-        val response = listOf(ErrorMessage(ErrorsCodesEnum.DateTimeParseException, "A data ${ex.cause} não corresponde ao tipo ISO8601"))
+        val response = ErrorResponse(
+            listOf(
+                ErrorMessage(ErrorsCodesEnum.DateTimeParseException, "A data ${ex.cause} não corresponde ao tipo ISO8601")
+            )
+        )
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
@@ -59,9 +67,13 @@ class GenericHandler {
     }
 
     @ExceptionHandler(UserNotFoundException::class)
-    fun handle(ex: UserNotFoundException, request: WebRequest): ResponseEntity<List<ErrorMessage>> {
+    fun handle(ex: UserNotFoundException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("User Not Found Exception observed: ${ex.message}", ex)
-        val response = listOf(ErrorMessage(ErrorsCodesEnum.UserNotFoundException, ex.message ?: "User Not Found"))
+        val response = ErrorResponse(
+            listOf(
+                ErrorMessage(ErrorsCodesEnum.UserNotFoundException, ex.message ?: "User Not Found")
+            )
+        )
 
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
@@ -69,13 +81,15 @@ class GenericHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handle(ex: HttpMessageNotReadableException, request: WebRequest): ResponseEntity<List<ErrorMessage>> {
+    fun handle(ex: HttpMessageNotReadableException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Http Message Not Readable Exception observed: ${ex.message}", ex)
         if(ex.mostSpecificCause is DateTimeParseException) {
-            val response = listOf(
-                ErrorMessage(
-                    ErrorsCodesEnum.DateTimeParseException,
-                    "O valor \"${(ex.mostSpecificCause as DateTimeParseException).parsedString}\" não é um tipo de Data valido."
+            val response = ErrorResponse(
+                listOf(
+                    ErrorMessage(
+                        ErrorsCodesEnum.DateTimeParseException,
+                        "O valor \"${(ex.mostSpecificCause as DateTimeParseException).parsedString}\" não é um tipo de Data valido."
+                    )
                 )
             )
 
@@ -84,7 +98,11 @@ class GenericHandler {
                 .body(response)
         }
 
-        val response = listOf(ErrorMessage(ErrorsCodesEnum.HttpMessageNotReadableException, ex.message ?: "Cannot Read Http Message"))
+        val response = ErrorResponse(
+            listOf(
+                ErrorMessage(ErrorsCodesEnum.HttpMessageNotReadableException, ex.message ?: "Cannot Read Http Message")
+            )
+        )
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
@@ -92,9 +110,11 @@ class GenericHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handle(ex: Exception, request: WebRequest): ResponseEntity<List<ErrorMessage>> {
+    fun handle(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Exception observed: ${ex.message}", ex)
-        val response = listOf(ErrorMessage(ErrorsCodesEnum.Exception, ex.message ?: "Internal server error"))
+        val response = ErrorResponse(
+            listOf(ErrorMessage(ErrorsCodesEnum.Exception, ex.message ?: "Internal server error"))
+        )
 
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
