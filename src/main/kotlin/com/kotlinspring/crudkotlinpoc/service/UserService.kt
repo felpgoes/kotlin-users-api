@@ -77,13 +77,11 @@ class UserService(private val userRepository: UserRepository, private val stackR
     }
 
     fun delete(userId: String) {
-        val user = userRepository.findById(userId)
+        val user = userRepository
+            .findById(userId)
+            .orElseThrow { UserNotFoundException(userId) }
 
-        if (!user.isPresent) {
-            throw UserNotFoundException(userId)
-        }
-
-        userRepository.deleteById(userId)
+        userRepository.delete(user)
     }
 
     fun create(body: UserDTO): UserDTO {
@@ -118,6 +116,11 @@ class UserService(private val userRepository: UserRepository, private val stackR
         return UserDTO(updated.id, updated.nick, updated.name, updated.birthDate, body.stack)
     }
 
-    fun findStacks(userId: String): List<StackDTO> =
-        stackRepository.findByUserId(userId).map { StackDTO(it.name, it.level) }
+    fun findStacks(userId: String): List<StackDTO> {
+        userRepository
+            .findById(userId)
+            .orElseThrow { UserNotFoundException(userId) }
+
+        return stackRepository.findByUserId(userId).map { StackDTO(it.name, it.level) }
+    }
 }
