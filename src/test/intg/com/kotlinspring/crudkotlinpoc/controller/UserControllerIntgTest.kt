@@ -344,8 +344,6 @@ class UserControllerIntgTest : OracleContainerInitializer() {
             )
 
             val saved = testRestTemplate.postForObject(baseUrl, user, UserDTO::class.java)
-            println("------------ \n INDEX = $i \n --------------")
-            println(saved)
             users.add(saved)
         }
 
@@ -359,20 +357,23 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
     @ParameterizedTest
     @MethodSource("findWithSorts")
-    fun shouldRetrieveUserStacksWithSuccess(sort: Direction, field: String, size: Int, quantity: Int) {
+    fun shouldRetrieveUserStacksWithSuccess(sort: Direction, field: String, size: Int, quantity: Int, page: Int, status: HttpStatus) {
+        val startingWith = size * page
+        val a = startingWith + size
+        val endingWith = if (a <= quantity) a else quantity
+        println("starting=$startingWith, a=$a, ending=$endingWith")
         val users = createUsers(quantity)
 
         val direction = if (sort.isDescending) "-" else "+"
 
-        val searchUrl = "$baseUrl?page=0&size=$size&sort=$direction$field"
+        val searchUrl = "$baseUrl?page=$page&pageSize=$size&sort=$direction$field"
         val retrievedUserDTO = testRestTemplate.getForEntity<PaginationResponse<LinkedHashMap<String, Any>>>(searchUrl)
 
         assertNotNull(retrievedUserDTO.body)
-        assertEquals(retrievedUserDTO.statusCode, HttpStatus.OK)
+        assertEquals(retrievedUserDTO.statusCode, status)
         assertEquals(retrievedUserDTO.body!!.total, quantity.toLong())
-        assertEquals(retrievedUserDTO.body!!.records.size, quantity)
-        assertTrue(retrievedUserDTO.body!!.records.size <= size)
-
+        assertEquals(retrievedUserDTO.body!!.records.size, endingWith - startingWith)
+        assertTrue(retrievedUserDTO.body!!.records.size <= endingWith - startingWith)
 
         val sortedUsers = if (sort.isDescending) {
             users.sortedWith(
@@ -390,11 +391,8 @@ class UserControllerIntgTest : OracleContainerInitializer() {
             )
         }
 
-        println(sortedUsers)
-        println(retrievedUserDTO.body!!.records)
-        assertEquals(sortedUsers.map {it.id}, retrievedUserDTO.body!!.records.map { it["id"] })
+        assertEquals(retrievedUserDTO.body!!.records.map { it["id"] }, sortedUsers.slice(IntRange(startingWith, endingWith - 1)).map {it.id})
     }
-
 
     @Test
     fun shouldRetrievePaginationWithEmptyRecordsWithSuccess() {
@@ -411,9 +409,15 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         @JvmStatic
         fun findWithSorts(): Stream<Arguments> {
             return Stream.of(
-                Arguments.arguments(Direction.ASC, "name", 2, 2),
-                Arguments.arguments(Direction.DESC, "name", 2, 2)
-
+                Arguments.arguments(Direction.ASC, "name", 2, 2, 0, HttpStatus.OK),
+                Arguments.arguments(Direction.DESC, "name", 2, 2, 0, HttpStatus.OK),
+                Arguments.arguments(Direction.ASC, "nick", 5, 5, 0, HttpStatus.OK),
+                Arguments.arguments(Direction.DESC, "name", 5, 10, 0, HttpStatus.PARTIAL_CONTENT),
+                Arguments.arguments(Direction.DESC, "nick", 5, 10, 0, HttpStatus.PARTIAL_CONTENT),
+                Arguments.arguments(Direction.DESC, "name", 5, 7, 1, HttpStatus.OK),
+                Arguments.arguments(Direction.DESC, "nick", 5, 7, 1, HttpStatus.OK),
+                Arguments.arguments(Direction.DESC, "name", 1, 10, 5, HttpStatus.PARTIAL_CONTENT),
+                Arguments.arguments(Direction.DESC, "nick", 1, 10, 9, HttpStatus.OK),
             )
 
         }
