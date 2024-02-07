@@ -26,18 +26,4 @@ data class Stack(
     override fun hashCode(): Int {
         return this.id.hashCode()
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Stack
-
-        if (id != other.id) return false
-        if (name != other.name) return false
-        if (level != other.level) return false
-        if (user != other.user) return false
-
-        return true
-    }
 }

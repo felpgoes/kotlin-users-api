@@ -51,21 +51,6 @@ class GenericHandler {
             .body(ErrorResponse(errors))
     }
 
-    @ExceptionHandler(DateTimeParseException::class)
-    fun handle(ex: DateTimeParseException, request: WebRequest): ResponseEntity<ErrorResponse> {
-        logger.error("DateTime Parse Exception observed: ${ex.parsedString}", ex)
-
-        val response = ErrorResponse(
-            listOf(
-                ErrorMessage(ErrorsCodesEnum.DateTimeParseException, "A data ${ex.cause} não corresponde ao tipo ISO8601")
-            )
-        )
-
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(response)
-    }
-
     @ExceptionHandler(UserNotFoundException::class)
     fun handle(ex: UserNotFoundException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("User Not Found Exception observed: ${ex.message}", ex)
