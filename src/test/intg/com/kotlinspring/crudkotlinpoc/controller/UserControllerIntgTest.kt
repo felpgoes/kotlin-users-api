@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.data.domain.Sort
 import org.springframework.data.domain.Sort.Direction
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -28,7 +27,6 @@ import java.net.URI
 import java.time.LocalDateTime
 import java.util.stream.Stream
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.memberProperties
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
