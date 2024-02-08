@@ -33,6 +33,6 @@ docker container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcom
 - [x] Alterar todos os endpoints para retornar o novo campo level
 - [x] Deve ser possível buscar a lista de tecnologias de um usuário
 - [x] Implementar testes unitários e de integração
-- [ ] Etapas opcionais
+- [x] Etapas opcionais
 
 
