@@ -1,0 +1,41 @@
+version: "3.7"
+#  container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcome123 container-registry.oracle.com/database/express:latest
+services:
+  oracle:
+    hostname: oracle
+    image: container-registry.oracle.com/database/express:latest
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PWD=welcome123
+    networks:
+      - network_legal
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: '2GB'
+  crud-kotlin-poc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - network_legal
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle:1521:xe
+      - SPRING_DATASOURCE_USERNAME=system
+      - SPRING_DATASOURCE_PASSWORD=welcome123
+      - JPA_SHOW_SQL=true
+      - JPA_HIBERNATE_DDL_TRUE=create-drop
+    depends_on:
+      oracle:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: '2GB'
+networks:
+  network_legal:
