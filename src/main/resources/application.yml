@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: crud-kotlin-poc
   jackson:
     property-naming-strategy: SNAKE_CASE
   datasource:
