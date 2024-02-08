@@ -21,11 +21,14 @@ data class User(
     @OneToMany(
         mappedBy = "user",
         cascade = [CascadeType.ALL],
-        orphanRemoval = true
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
     )
-    var stack: List<Stack>? = mutableListOf()
+    val stack: MutableSet<Stack> = mutableSetOf()
 ) {
-    override fun toString(): String {
-        return "[id=$id, name=$name, birthDate=$birthDate, stack=${stack?.joinToString { it.name }}]"
+    override fun hashCode(): Int {
+        if (!id.isNullOrEmpty()) return id.hashCode()
+
+        return super.hashCode()
     }
 }

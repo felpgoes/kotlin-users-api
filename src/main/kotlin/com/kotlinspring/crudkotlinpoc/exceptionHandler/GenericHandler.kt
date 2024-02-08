@@ -12,70 +12,98 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import java.time.format.DateTimeParseException
 
+
+
 @Component
 @ControllerAdvice
 class GenericHandler {
     companion object : KLogging()
 
-    data class InvalidFieldResponse (
-        val campo: String,
-        val message: String
+    enum class ErrorsCodesEnum {
+        MethodArgumentNotValidException,
+        DateTimeParseException,
+        UserNotFoundException,
+        HttpMessageNotReadableException,
+        Exception,
+    }
+
+    data class ErrorResponse (
+        val errorMessages: List<ErrorMessage>
+    )
+
+    data class ErrorMessage (
+        val code: ErrorsCodesEnum,
+        val description: String
     )
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handle(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<List<InvalidFieldResponse>> {
+    fun handle(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Method Argument Not Valid Exception Exception observed: ${ex.message}", ex)
 
         val errors = ex.bindingResult.allErrors
-            .map { error -> InvalidFieldResponse(error.codes?.get(1) ?: "Desconhecido", error.defaultMessage!!) }
-            .sortedBy { it.campo }
+            .map { error -> ErrorMessage(ErrorsCodesEnum.MethodArgumentNotValidException, error.defaultMessage!!) }
+            .sortedBy { it.code }
 
         logger.info("errors: $errors")
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(errors)
-    }
-
-    @ExceptionHandler(DateTimeParseException::class)
-    fun handleDateTimeParseException(ex: DateTimeParseException, request: WebRequest): ResponseEntity<Any> {
-        logger.error("DateTime Parse Exception observed: ${ex.parsedString}", ex)
-
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body("A data ${ex.cause} não corresponde ao tipo ISO8601")
+            .body(ErrorResponse(errors))
     }
 
     @ExceptionHandler(UserNotFoundException::class)
-    fun handle(ex: UserNotFoundException, request: WebRequest): ResponseEntity<Any> {
+    fun handle(ex: UserNotFoundException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("User Not Found Exception observed: ${ex.message}", ex)
+        val response = ErrorResponse(
+            listOf(
+                ErrorMessage(ErrorsCodesEnum.UserNotFoundException, ex.message ?: "User Not Found")
+            )
+        )
 
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
-            .body(ex.message)
+            .body(response)
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handle(ex: HttpMessageNotReadableException, request: WebRequest): ResponseEntity<Any> {
+    fun handle(ex: HttpMessageNotReadableException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Http Message Not Readable Exception observed: ${ex.message}", ex)
         if(ex.mostSpecificCause is DateTimeParseException) {
+            val response = ErrorResponse(
+                listOf(
+                    ErrorMessage(
+                        ErrorsCodesEnum.DateTimeParseException,
+                        "O valor \"${(ex.mostSpecificCause as DateTimeParseException).parsedString}\" não é um tipo de Data valido."
+                    )
+                )
+            )
 
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body("O valor \"${(ex.mostSpecificCause as DateTimeParseException).parsedString}\" não é um tipo de Data valido.")
+                .body(response)
         }
+
+        val response = ErrorResponse(
+            listOf(
+                ErrorMessage(ErrorsCodesEnum.HttpMessageNotReadableException, ex.message ?: "Cannot Read Http Message")
+            )
+        )
+
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(ex.message)
+            .body(response)
     }
 
     @ExceptionHandler(Exception::class)
-    fun handle(ex: Exception, request: WebRequest): ResponseEntity<Any> {
+    fun handle(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Exception observed: ${ex.message}", ex)
+        val response = ErrorResponse(
+            listOf(ErrorMessage(ErrorsCodesEnum.Exception, ex.message ?: "Internal server error"))
+        )
 
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ex.message)
+            .body(response)
     }
 
 }
