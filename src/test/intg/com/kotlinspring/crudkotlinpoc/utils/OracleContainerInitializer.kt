@@ -13,6 +13,7 @@ import org.testcontainers.utility.DockerImageName
 @ContextConfiguration(initializers = [OracleContainerInitializer.Initializer::class])
 abstract class OracleContainerInitializer {
     companion object {
+        private const val MEMORY_IN_BYTES = 2L * 1024L * 1024L * 1024L
 
         @Container
         private val oracleDB = OracleContainer(
@@ -21,6 +22,9 @@ abstract class OracleContainerInitializer {
                 .asCompatibleSubstituteFor("gvenzl/oracle-xe")
         ).apply {
             withEnv("ORACLE_PWD", "welcome123")
+            withCreateContainerCmdModifier {
+                it.hostConfig?.withMemory(MEMORY_IN_BYTES)
+            }
         }
     }
 
