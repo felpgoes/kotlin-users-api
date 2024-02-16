@@ -63,17 +63,13 @@ class UserService(private val userRepository: UserRepository, private val stackR
     }
 
     fun find(userId: String): UserDTO {
-        val user = userRepository.findById(userId)
+        val user = userRepository
+            .findById(userId)
+            .orElseThrow { UserNotFoundException(userId) }
 
-        if (!user.isPresent) {
-            throw UserNotFoundException(userId)
-        }
+        val stack = user.stack.map { st -> StackDTO(st.name, st.level) }
 
-        return user.get().let {
-            val stack = it.stack.map { st -> StackDTO(st.name, st.level) }
-
-            UserDTO(it.id, it.nick, it.name, it.birthDate, stack.toMutableSet())
-        }
+        return UserDTO(user.id, user.nick, user.name, user.birthDate, stack.toMutableSet())
     }
 
     fun delete(userId: String) {
@@ -99,19 +95,21 @@ class UserService(private val userRepository: UserRepository, private val stackR
             .findById(userId)
             .orElseThrow { UserNotFoundException(userId) }
 
-        user.name = body.name
-        user.nick = body.nick
-        user.birthDate = body.birthDate
+        val userToUpdate = user.copy(
+            name = body.name,
+            nick = body.nick,
+            birthDate = body.birthDate
+        )
 
         val newStacks = mutableSetOf<Stack>()
         body.stack?.forEach {
-            val alreadyExists = user.stack.find { it2 -> it2.name == it.name }
-            newStacks.add(Stack(alreadyExists?.id, it.name, it.level, user))
+            val alreadyExists = userToUpdate.stack.find { it2 -> it2.name == it.name }
+            newStacks.add(Stack(alreadyExists?.id, it.name, it.level, userToUpdate))
         }
-        user.stack.clear()
-        user.stack.addAll(newStacks)
+        userToUpdate.stack.clear()
+        userToUpdate.stack.addAll(newStacks)
 
-        val updated = userRepository.save(user)
+        val updated = userRepository.save(userToUpdate)
 
         return UserDTO(updated.id, updated.nick, updated.name, updated.birthDate, body.stack)
     }
