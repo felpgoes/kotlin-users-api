@@ -44,7 +44,7 @@ docker container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcom
 - [x] Criar novo construtor para o ErrorResponse receber apenas um ErrorMessage
 - [x] Utilizar a annotation @Repository no UserRepository
 - [x] Remover usos o Optional.isPresent na UserService
-- [ ] Substituir o Camel Case do nome dos testes para espaços
+- [x] Substituir o Camel Case do nome dos testes para espaços
 - [ ] Utilizar Tags do JUnit nos testes 
 - [ ] Substituir `exchange` por `testRestTemplate.[METHOD]`
 - [ ] Fazer a validação das Collections com `assertThat` ao invés de multiplos usos do `assertEquals`
