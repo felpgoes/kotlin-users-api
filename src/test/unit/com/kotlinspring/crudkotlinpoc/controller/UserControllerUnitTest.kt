@@ -26,7 +26,7 @@ class UserControllerUnitTest {
     private val validBirthDate: LocalDateTime = LocalDateTime.of(2000,2,4, 17,15,28)
 
     @Test
-    fun shouldStoreUserWithSuccess() {
+    fun `should store user with success`() {
         val userDTO = UserDTO(
             null,
             "v",
@@ -45,7 +45,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithNickValidationError() {
+    fun `should not store user with nick validation error`() {
         val userDTO = UserDTO(
             null,
             "vapo".repeat(10),
@@ -66,7 +66,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithNameTooLargeValidationError() {
+    fun `should not store user with name too large validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
@@ -87,7 +87,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithNameEmptyValidationError() {
+    fun `should not store user with name empty validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
@@ -109,7 +109,7 @@ class UserControllerUnitTest {
 
 
     @Test
-    fun shouldNotStoreUserWithEmptyStackValidationError() {
+    fun `should not store user with empty stack validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
@@ -130,7 +130,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithLevelGreaterThen100StackValidationError() {
+    fun `should not store user with level greater then 100 stack validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
@@ -151,7 +151,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithLevelLowerThen1StackValidationError() {
+    fun `should not store user with level lower then 1 stack validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
@@ -171,7 +171,7 @@ class UserControllerUnitTest {
         assertEquals(error.message, "Invalid Stack List")
     }
     @Test
-    fun shouldRetrieveUserWithSuccess() {
+    fun `should retrieve user with success`() {
         val id = "ID_LEGAL_123"
         val userDTO = UserDTO(id, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 99), StackDTO("JS", 100)))
 
@@ -185,7 +185,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldRetrieveUserWithNotFoundError() {
+    fun `should retrieve user with not found error`() {
         val userId = "99999-ID"
         every { userServiceMock.find(any()) } throws UserNotFoundException(userId)
 

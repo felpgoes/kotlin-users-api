@@ -48,7 +48,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
     @Nested
     inner class FindById {
         @Test
-        fun shouldRetrieveUserWithSuccess() {
+        fun `should retrieve user with success`() {
             val userDTO =
                 UserDTO(null, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10)))
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
@@ -62,7 +62,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldRetrieveUserWithNotFoundError() {
+        fun `should retrieve user with not found error`() {
             val userId = "ID_LEGAL_123"
             val retrievedUser = testRestTemplate.getForEntity<GenericHandler.ErrorResponse>("$baseUrl/$userId")
 
@@ -80,7 +80,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
     @Nested
     inner class Store {
         @Test
-        fun shouldStoreUserWithSuccess() {
+        fun `should store user with success`() {
             val userDTO =
                 UserDTO(null, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10)))
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
@@ -92,7 +92,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotStoreUserWithNickValidationError() {
+        fun `should not store user with nick validation error`() {
             val userDTO = UserDTO(
                 null,
                 "vapo".repeat(10),
@@ -116,7 +116,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotStoreUserWithNameTooLargeValidationError() {
+        fun `should not store user with name too large validation error`() {
             val userDTO = UserDTO(
                 null,
                 "V",
@@ -140,7 +140,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotStoreUserWithNameEmptyValidationError() {
+        fun `should not store user with name empty validation error`() {
             val userDTO = UserDTO(
                 null,
                 "V",
@@ -165,7 +165,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotStoreUserWithBirthDateValidationError() {
+        fun `should not store user with birth date validation error`() {
             val invalidBirthDate = "ameixa-02-04"
 
             val userDTO = mapOf(
@@ -191,7 +191,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotStoreUserWithEmptyStackValidationError() {
+        fun `should not store user with empty stack validation error`() {
             val userDTO = UserDTO(
                 null,
                 "V",
@@ -218,7 +218,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
     @Nested
     inner class Update {
         @Test
-        fun shouldUpdateUserWithSuccess() {
+        fun `should update user with success`() {
             val userDTO = UserDTO(
                 null,
                 "vvv",
@@ -251,7 +251,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotUpdateUserWithNotFoundError() {
+        fun `should not update user with not found error`() {
             val userId = "ID_LEGAL_123"
             val updateBody = UserDTO(
                 null,
@@ -283,7 +283,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
     @Nested
     inner class FindStack {
         @Test
-        fun shouldRetrieveUserStacksWithSuccess() {
+        fun `should retrieve user stacks with success`() {
             val userDTO =
                 UserDTO(null, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10)))
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
@@ -298,7 +298,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldNotRetrieveUserStacksWithNotFoundError() {
+        fun `should not retrieve user stacks with not found error`() {
             val userId = "ID_LEGAL_123"
             val result = testRestTemplate.getForEntity<GenericHandler.ErrorResponse>("$baseUrl/$userId/stack")
 
@@ -313,7 +313,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         }
 
         @Test
-        fun shouldRetrieveUserWithEmptyStacksWithSuccess() {
+        fun `should retrieve user with empty stacks with success`() {
             val userDTO = UserDTO(null, "v", "Felipe", validBirthDate, null)
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
             val retrievedUserDTO = testRestTemplate.getForEntity<List<StackDTO>>("$baseUrl/${savedUserDTO.id}/stack")
@@ -355,7 +355,14 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
     @ParameterizedTest
     @MethodSource("findWithSorts")
-    fun shouldRetrieveUserStacksWithSuccess(sort: Direction, field: String, size: Int, quantity: Int, page: Int, status: HttpStatus) {
+    fun `should retrieve user stacks with success`(
+        sort: Direction,
+        field: String,
+        size: Int,
+        quantity: Int,
+        page: Int,
+        status: HttpStatus,
+    ) {
         val startingWith = size * page
         val a = startingWith + size
         val endingWith = if (a <= quantity) a else quantity
@@ -389,11 +396,13 @@ class UserControllerIntgTest : OracleContainerInitializer() {
             )
         }
 
-        assertEquals(retrievedUserDTO.body!!.records.map { it["id"] }, sortedUsers.slice(IntRange(startingWith, endingWith - 1)).map {it.id})
+        assertEquals(
+            retrievedUserDTO.body!!.records.map { it["id"] },
+            sortedUsers.slice(IntRange(startingWith, endingWith - 1)).map { it.id })
     }
 
     @Test
-    fun shouldRetrievePaginationWithEmptyRecordsWithSuccess() {
+    fun `should retrieve pagination with empty records with success`() {
         val retrievedUserDTO = testRestTemplate.getForEntity<PaginationResponse<UserDTO>>(baseUrl)
 
         assertNotNull(retrievedUserDTO.body)
@@ -420,6 +429,4 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
         }
     }
-
-
 }

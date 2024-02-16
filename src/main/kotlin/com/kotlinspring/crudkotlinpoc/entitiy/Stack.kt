@@ -24,6 +24,8 @@ data class Stack(
     }
 
     override fun hashCode(): Int {
-        return this.id.hashCode()
+        if (!id.isNullOrEmpty()) return id.hashCode()
+
+        return super.hashCode()
     }
 }
