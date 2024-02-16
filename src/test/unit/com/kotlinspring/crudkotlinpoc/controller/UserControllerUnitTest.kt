@@ -185,7 +185,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun `should retrieve user with not found error`() {
+    fun shouldRetrieveUserWithNotFoundError() {
         val userId = "99999-ID"
         every { userServiceMock.find(any()) } throws UserNotFoundException(userId)
 
