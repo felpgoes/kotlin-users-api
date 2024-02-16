@@ -13,7 +13,6 @@ import org.springframework.web.context.request.WebRequest
 import java.time.format.DateTimeParseException
 
 
-
 @Component
 @ControllerAdvice
 class GenericHandler {
@@ -27,13 +26,15 @@ class GenericHandler {
         Exception,
     }
 
-    data class ErrorResponse (
-        val errorMessages: List<ErrorMessage>
-    )
+    data class ErrorResponse(
+        val errorMessages: List<ErrorMessage>,
+    ) {
+        constructor(errorMessage: ErrorMessage) : this(listOf(errorMessage))
+    }
 
-    data class ErrorMessage (
+    data class ErrorMessage(
         val code: ErrorsCodesEnum,
-        val description: String
+        val description: String,
     )
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
@@ -54,11 +55,8 @@ class GenericHandler {
     @ExceptionHandler(UserNotFoundException::class)
     fun handle(ex: UserNotFoundException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("User Not Found Exception observed: ${ex.message}", ex)
-        val response = ErrorResponse(
-            listOf(
-                ErrorMessage(ErrorsCodesEnum.UserNotFoundException, ex.message ?: "User Not Found")
-            )
-        )
+        val response =
+            ErrorResponse(ErrorMessage(ErrorsCodesEnum.UserNotFoundException, ex.message ?: "User Not Found"))
 
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
@@ -68,13 +66,11 @@ class GenericHandler {
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handle(ex: HttpMessageNotReadableException, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Http Message Not Readable Exception observed: ${ex.message}", ex)
-        if(ex.mostSpecificCause is DateTimeParseException) {
+        if (ex.mostSpecificCause is DateTimeParseException) {
             val response = ErrorResponse(
-                listOf(
-                    ErrorMessage(
-                        ErrorsCodesEnum.DateTimeParseException,
-                        "O valor \"${(ex.mostSpecificCause as DateTimeParseException).parsedString}\" não é um tipo de Data valido."
-                    )
+                ErrorMessage(
+                    ErrorsCodesEnum.DateTimeParseException,
+                    "O valor \"${(ex.mostSpecificCause as DateTimeParseException).parsedString}\" não é um tipo de Data valido."
                 )
             )
 
@@ -84,9 +80,7 @@ class GenericHandler {
         }
 
         val response = ErrorResponse(
-            listOf(
-                ErrorMessage(ErrorsCodesEnum.HttpMessageNotReadableException, ex.message ?: "Cannot Read Http Message")
-            )
+            ErrorMessage(ErrorsCodesEnum.HttpMessageNotReadableException, ex.message ?: "Cannot Read Http Message")
         )
 
         return ResponseEntity
@@ -98,7 +92,7 @@ class GenericHandler {
     fun handle(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> {
         logger.error("Exception observed: ${ex.message}", ex)
         val response = ErrorResponse(
-            listOf(ErrorMessage(ErrorsCodesEnum.Exception, ex.message ?: "Internal server error"))
+            ErrorMessage(ErrorsCodesEnum.Exception, ex.message ?: "Internal server error")
         )
 
         return ResponseEntity
