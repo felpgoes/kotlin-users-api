@@ -39,8 +39,8 @@ docker container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcom
 
 #### Adicional
 - [ ] Utilizar Java 21
-- [ ] Validar na função hashCode se o `id` é nulo. 
-- [ ] Remover uso de `var` nas entidades
+- [x] Validar na função hashCode se o `id` é nulo. 
+- [x] Remover uso de `var` nas entidades
 - [ ] Criar novo construtor para o ErrorResponse receber apenas um ErrorMessage
 - [ ] Utilizar a annotation @Repository no UserRepository
 - [ ] Remover usos o Optional.isPresent na UserService

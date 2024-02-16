@@ -10,13 +10,13 @@ data class User(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String?,
 
-    var nick: String?,
+    val nick: String?,
 
     @Column(unique = true, nullable = false)
-    var name: String,
+    val name: String,
 
     @Column(nullable = false)
-    var birthDate: LocalDateTime,
+    val birthDate: LocalDateTime,
 
     @OneToMany(
         mappedBy = "user",
