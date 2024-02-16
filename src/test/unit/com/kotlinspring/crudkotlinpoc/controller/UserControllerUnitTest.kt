@@ -170,6 +170,7 @@ class UserControllerUnitTest {
         assertEquals(error.propertyPath.toString(), "store.body.stack")
         assertEquals(error.message, "Invalid Stack List")
     }
+
     @Test
     fun `should retrieve user with success`() {
         val id = "ID_LEGAL_123"
