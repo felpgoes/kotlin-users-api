@@ -100,10 +100,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO = testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
@@ -124,10 +121,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO = testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
@@ -148,11 +142,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO = testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
@@ -175,11 +165,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 "birth_date" to invalidBirthDate,
                 "stack" to mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO = testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
@@ -199,10 +185,7 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("", 10))
             )
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO = testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
