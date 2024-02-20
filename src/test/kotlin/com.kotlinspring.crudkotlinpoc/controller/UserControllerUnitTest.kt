@@ -9,12 +9,14 @@ import io.mockk.every
 import jakarta.validation.ConstraintViolationException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import java.time.LocalDateTime
 
+@Tag("unit")
 @WebMvcTest(controllers = [UserController::class])
 class UserControllerUnitTest {
     @MockkBean
@@ -170,6 +172,7 @@ class UserControllerUnitTest {
         assertEquals(error.propertyPath.toString(), "store.body.stack")
         assertEquals(error.message, "Invalid Stack List")
     }
+
     @Test
     fun `should retrieve user with success`() {
         val id = "ID_LEGAL_123"
@@ -185,7 +188,7 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun `should retrieve user with not found error`() {
+    fun shouldRetrieveUserWithNotFoundError() {
         val userId = "99999-ID"
         every { userServiceMock.find(any()) } throws UserNotFoundException(userId)
 

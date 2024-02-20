@@ -1,13 +1,15 @@
-package com.kotlinspring.crudkotlinpoc.controller
+package com.kotlinspring.crudkotlinpoc.integration
 
 import com.kotlinspring.crudkotlinpoc.dto.PaginationResponse
 import com.kotlinspring.crudkotlinpoc.dto.StackDTO
 import com.kotlinspring.crudkotlinpoc.dto.UserDTO
 import com.kotlinspring.crudkotlinpoc.exceptionHandler.GenericHandler
 import com.kotlinspring.crudkotlinpoc.utils.OracleContainerInitializer
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -29,6 +31,7 @@ import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 
 
+@Tag("integration")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerIntgTest : OracleContainerInitializer() {
 
@@ -55,10 +58,10 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
             val retrievedUserDTO = testRestTemplate.getForEntity<UserDTO>("$baseUrl/${savedUserDTO.id}")
 
-            assertNotNull(retrievedUserDTO.body)
             assertEquals(retrievedUserDTO.statusCode, HttpStatus.OK)
-            assertEquals(retrievedUserDTO.body!!.id, savedUserDTO.id)
-            assertEquals(savedUserDTO, retrievedUserDTO.body)
+            assertThat(retrievedUserDTO.body)
+                .isNotNull
+                .isEqualTo(savedUserDTO)
         }
 
         @Test
@@ -68,12 +71,16 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
             assertNotNull(retrievedUser.body)
             assertEquals(retrievedUser.statusCode, HttpStatus.NOT_FOUND)
-            assertEquals(retrievedUser.body!!.errorMessages.size, 1)
-            assertEquals(retrievedUser.body!!.errorMessages.first()::class, GenericHandler.ErrorMessage::class)
 
-            val error = retrievedUser.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.UserNotFoundException)
-            assertEquals(error.description, "User not found with id: ID_LEGAL_123")
+            assertThat(retrievedUser.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.UserNotFoundException,
+                        "User not found with id: ID_LEGAL_123"
+                    )
+                )
         }
     }
 
@@ -85,10 +92,9 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 UserDTO(null, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10)))
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
 
-            assertNotNull(savedUserDTO)
-            assertEquals(savedUserDTO::class, UserDTO::class)
-            assertEquals(savedUserDTO.name, userDTO.name)
-            assertNotNull(savedUserDTO.id)
+            assertThat(savedUserDTO)
+                .isNotNull
+                .isEqualTo(userDTO.copy(id = savedUserDTO.id))
         }
 
         @Test
@@ -100,19 +106,21 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO =
+                testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-            assertEquals(savedUserDTO.body!!.errorMessages.size, 1)
-
-            val error = savedUserDTO.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException)
-            assertEquals(error.description, "O campo não pode exceder 32 caracteres")
+            assertThat(savedUserDTO.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException,
+                        "O campo não pode exceder 32 caracteres"
+                    )
+                )
         }
 
         @Test
@@ -124,19 +132,21 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO =
+                testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-            assertEquals(savedUserDTO.body!!.errorMessages.size, 1)
-
-            val error = savedUserDTO.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException)
-            assertEquals(error.description, "O campo não pode exceder 255 caracteres")
+            assertThat(savedUserDTO.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException,
+                        "O campo não pode exceder 255 caracteres"
+                    )
+                )
         }
 
         @Test
@@ -148,20 +158,21 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO =
+                testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-            assertEquals(savedUserDTO.body!!.errorMessages.size, 1)
-
-            val error = savedUserDTO.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException)
-            assertEquals(error.description, "O campo não pode ser vazio")
+            assertThat(savedUserDTO.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException,
+                        "O campo não pode ser vazio"
+                    )
+                )
         }
 
         @Test
@@ -175,19 +186,21 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 "birth_date" to invalidBirthDate,
                 "stack" to mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10))
             )
-
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO =
+                testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
-            assertEquals(savedUserDTO.body!!.errorMessages.size, 1)
 
-            val error = savedUserDTO.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.DateTimeParseException)
-            assertEquals(error.description, "O valor \"$invalidBirthDate\" não é um tipo de Data valido.")
+            assertThat(savedUserDTO.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.DateTimeParseException,
+                        "O valor \"$invalidBirthDate\" não é um tipo de Data valido."
+                    )
+                )
         }
 
         @Test
@@ -199,19 +212,21 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 validBirthDate,
                 mutableSetOf(StackDTO("NodeJS", 10), StackDTO("", 10))
             )
-            val savedUserDTO = testRestTemplate.exchange(
-                RequestEntity.post(baseUrl).body(userDTO),
-                object : ParameterizedTypeReference<GenericHandler.ErrorResponse>() {}
-            )
+            val savedUserDTO =
+                testRestTemplate.postForEntity(baseUrl, userDTO, GenericHandler.ErrorResponse::class.java)
 
             assertNotNull(savedUserDTO.body)
             assertEquals(savedUserDTO.statusCode, HttpStatus.BAD_REQUEST)
 
-            assertEquals(savedUserDTO.body!!.errorMessages.size, 1)
-
-            val error = savedUserDTO.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException)
-            assertEquals(error.description, "Invalid Stack List")
+            assertThat(savedUserDTO.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.MethodArgumentNotValidException,
+                        "Invalid Stack List"
+                    )
+                )
         }
     }
 
@@ -228,9 +243,8 @@ class UserControllerIntgTest : OracleContainerInitializer() {
             )
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
             val updateBody = savedUserDTO.copy(name = "Goes")
-            println("updateBody=$updateBody")
 
-            val result = testRestTemplate.exchange(
+            testRestTemplate.exchange(
                 RequestEntity<UserDTO>(
                     updateBody,
                     HttpMethod.PUT,
@@ -238,16 +252,12 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 ), UserDTO::class.java
             )
 
-            println(result)
             val retrievedUserDTO = testRestTemplate.getForEntity<UserDTO>("$baseUrl/${savedUserDTO.id}")
 
-            println("retrievedUserDTO=$retrievedUserDTO")
-            assertNotNull(retrievedUserDTO)
             assertEquals(retrievedUserDTO.statusCode, HttpStatus.OK)
-            assertEquals(retrievedUserDTO.body!!.id, savedUserDTO.id)
-            assertEquals(retrievedUserDTO.body!!.name, "Goes")
-            assertNotEquals(retrievedUserDTO.body!!.name, savedUserDTO.name)
-            assertEquals(updateBody, retrievedUserDTO.body)
+            assertThat(retrievedUserDTO.body)
+                .isNotNull
+                .isEqualTo(updateBody)
         }
 
         @Test
@@ -271,12 +281,16 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
             assertNotNull(result.body)
             assertEquals(result.statusCode, HttpStatus.NOT_FOUND)
-            assertEquals(result.body!!.errorMessages.size, 1)
-            assertEquals(result.body!!.errorMessages.first()::class, GenericHandler.ErrorMessage::class)
 
-            val error = result.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.UserNotFoundException)
-            assertEquals(error.description, "User not found with id: $userId")
+            assertThat(result.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.UserNotFoundException,
+                        "User not found with id: $userId"
+                    )
+                )
         }
     }
 
@@ -288,13 +302,19 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 UserDTO(null, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 10), StackDTO("JS", 10)))
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
 
-            val retrievedUserDTO = testRestTemplate.getForEntity<List<StackDTO>>("$baseUrl/${savedUserDTO.id}/stack")
+            val userStacksResponse = testRestTemplate.exchange(
+                RequestEntity.get("$baseUrl/${savedUserDTO.id}/stack").build(),
+                object : ParameterizedTypeReference<List<StackDTO>>() {}
+            )
 
-            assertNotNull(retrievedUserDTO.body)
-            assertEquals(retrievedUserDTO.statusCode, HttpStatus.OK)
-            assertEquals(retrievedUserDTO.body!!.size, userDTO.stack!!.size)
-            assertEquals(retrievedUserDTO.body!![1], mapOf("name" to "NodeJS", "level" to 10))
-            assertEquals(retrievedUserDTO.body!![0], mapOf("name" to "JS", "level" to 10))
+            assertNotNull(userStacksResponse.body)
+            assertEquals(userStacksResponse.statusCode, HttpStatus.OK)
+
+            assertThat(userStacksResponse.body)
+                .hasSize(2)
+                .usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(userDTO.stack)
         }
 
         @Test
@@ -304,12 +324,16 @@ class UserControllerIntgTest : OracleContainerInitializer() {
 
             assertNotNull(result.body)
             assertEquals(result.statusCode, HttpStatus.NOT_FOUND)
-            assertEquals(result.body!!.errorMessages.size, 1)
-            assertEquals(result.body!!.errorMessages.first()::class, GenericHandler.ErrorMessage::class)
 
-            val error = result.body!!.errorMessages.first()
-            assertEquals(error.code, GenericHandler.ErrorsCodesEnum.UserNotFoundException)
-            assertEquals(error.description, "User not found with id: $userId")
+            assertThat(result.body!!.errorMessages)
+                .hasSize(1)
+                .first()
+                .isEqualTo(
+                    GenericHandler.ErrorMessage(
+                        GenericHandler.ErrorsCodesEnum.UserNotFoundException,
+                        "User not found with id: $userId"
+                    )
+                )
         }
 
         @Test
@@ -318,13 +342,13 @@ class UserControllerIntgTest : OracleContainerInitializer() {
             val savedUserDTO = testRestTemplate.postForObject(baseUrl, userDTO, UserDTO::class.java)
             val retrievedUserDTO = testRestTemplate.getForEntity<List<StackDTO>>("$baseUrl/${savedUserDTO.id}/stack")
 
-            assertNotNull(retrievedUserDTO.body)
             assertEquals(retrievedUserDTO.statusCode, HttpStatus.OK)
-            assertEquals(retrievedUserDTO.body!!.size, 0)
+            assertThat(retrievedUserDTO.body)
+                .isNotNull
+                .isEmpty()
         }
 
     }
-
 
     private fun createUsers(quantity: Int): List<UserDTO> {
         val users = mutableListOf<UserDTO>()
@@ -366,7 +390,6 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         val startingWith = size * page
         val a = startingWith + size
         val endingWith = if (a <= quantity) a else quantity
-        println("starting=$startingWith, a=$a, ending=$endingWith")
         val users = createUsers(quantity)
 
         val direction = if (sort.isDescending) "-" else "+"
@@ -377,8 +400,6 @@ class UserControllerIntgTest : OracleContainerInitializer() {
         assertNotNull(retrievedUserDTO.body)
         assertEquals(retrievedUserDTO.statusCode, status)
         assertEquals(retrievedUserDTO.body!!.total, quantity.toLong())
-        assertEquals(retrievedUserDTO.body!!.records.size, endingWith - startingWith)
-        assertTrue(retrievedUserDTO.body!!.records.size <= endingWith - startingWith)
 
         val sortedUsers = if (sort.isDescending) {
             users.sortedWith(
@@ -395,18 +416,22 @@ class UserControllerIntgTest : OracleContainerInitializer() {
                 )
             )
         }
+            .slice(IntRange(startingWith, endingWith - 1))
+            .map { it.id }
 
-        assertEquals(
-            retrievedUserDTO.body!!.records.map { it["id"] },
-            sortedUsers.slice(IntRange(startingWith, endingWith - 1)).map { it.id })
+        val retrievedIds = retrievedUserDTO.body!!.records.map { it["id"] }
+
+        assertThat(retrievedIds)
+            .hasSize(endingWith - startingWith)
+            .isEqualTo(sortedUsers)
     }
 
     @Test
     fun `should retrieve pagination with empty records with success`() {
         val retrievedUserDTO = testRestTemplate.getForEntity<PaginationResponse<UserDTO>>(baseUrl)
 
-        assertNotNull(retrievedUserDTO.body)
         assertEquals(retrievedUserDTO.statusCode, HttpStatus.OK)
+        assertNotNull(retrievedUserDTO.body)
         assertEquals(retrievedUserDTO.body!!.records.size, 0)
         assertEquals(retrievedUserDTO.body!!.total, 0L)
 
