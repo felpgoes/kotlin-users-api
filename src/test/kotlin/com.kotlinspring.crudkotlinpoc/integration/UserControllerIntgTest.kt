@@ -1,4 +1,4 @@
-package com.kotlinspring.crudkotlinpoc.controller
+package com.kotlinspring.crudkotlinpoc.integration
 
 import com.kotlinspring.crudkotlinpoc.dto.PaginationResponse
 import com.kotlinspring.crudkotlinpoc.dto.StackDTO
@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -30,6 +31,7 @@ import java.util.stream.Stream
 import kotlin.reflect.KProperty1
 
 
+@Tag("integration")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerIntgTest : OracleContainerInitializer() {
 

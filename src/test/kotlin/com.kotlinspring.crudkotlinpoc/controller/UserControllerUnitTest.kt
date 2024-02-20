@@ -9,12 +9,14 @@ import io.mockk.every
 import jakarta.validation.ConstraintViolationException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import java.time.LocalDateTime
 
+@Tag("unit")
 @WebMvcTest(controllers = [UserController::class])
 class UserControllerUnitTest {
     @MockkBean
