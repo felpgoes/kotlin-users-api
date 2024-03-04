@@ -10,22 +10,25 @@ data class User(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String?,
 
-    var nick: String?,
+    val nick: String?,
 
     @Column(unique = true, nullable = false)
-    var name: String,
+    val name: String,
 
     @Column(nullable = false)
-    var birthDate: LocalDateTime,
+    val birthDate: LocalDateTime,
 
     @OneToMany(
         mappedBy = "user",
         cascade = [CascadeType.ALL],
-        orphanRemoval = true
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
     )
-    var stack: List<Stack>? = mutableListOf()
+    val stack: MutableSet<Stack> = mutableSetOf()
 ) {
-    override fun toString(): String {
-        return "[id=$id, name=$name, birthDate=$birthDate, stack=${stack?.joinToString { it.name }}]"
+    override fun hashCode(): Int {
+        if (!id.isNullOrEmpty()) return id.hashCode()
+
+        return super.hashCode()
     }
 }

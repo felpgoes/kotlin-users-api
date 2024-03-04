@@ -9,12 +9,14 @@ import io.mockk.every
 import jakarta.validation.ConstraintViolationException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import java.time.LocalDateTime
 
+@Tag("unit")
 @WebMvcTest(controllers = [UserController::class])
 class UserControllerUnitTest {
     @MockkBean
@@ -26,13 +28,13 @@ class UserControllerUnitTest {
     private val validBirthDate: LocalDateTime = LocalDateTime.of(2000,2,4, 17,15,28)
 
     @Test
-    fun shouldStoreUserWithSuccess() {
+    fun `should store user with success`() {
         val userDTO = UserDTO(
             null,
             "v",
             "Felipe",
             validBirthDate,
-            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
+            mutableSetOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -45,13 +47,13 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithNickValidationError() {
+    fun `should not store user with nick validation error`() {
         val userDTO = UserDTO(
             null,
             "vapo".repeat(10),
             "Felipe",
             validBirthDate,
-            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
+            mutableSetOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -66,13 +68,13 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithNameTooLargeValidationError() {
+    fun `should not store user with name too large validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
             "Felipe".repeat(50),
             validBirthDate,
-            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
+            mutableSetOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -87,13 +89,13 @@ class UserControllerUnitTest {
     }
 
     @Test
-    fun shouldNotStoreUserWithNameEmptyValidationError() {
+    fun `should not store user with name empty validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
             "",
             validBirthDate,
-            listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
+            mutableSetOf(StackDTO("NodeJS", 99), StackDTO("JS", 100))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -109,13 +111,13 @@ class UserControllerUnitTest {
 
 
     @Test
-    fun shouldNotStoreUserWithEmptyStackValidationError() {
+    fun `should not store user with empty stack validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
             "Felipe",
             validBirthDate,
-            listOf(StackDTO("NodeJS", 77), StackDTO("", 1))
+            mutableSetOf(StackDTO("NodeJS", 77), StackDTO("", 1))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -125,18 +127,18 @@ class UserControllerUnitTest {
 
         assertNotNull(error)
         assertEquals(error.constraintDescriptor.annotation.annotationClass.toString(), "class com.kotlinspring.crudkotlinpoc.decorators.ValidStackList")
-        assertEquals(error.propertyPath.toString(), "store.body.stackDTO")
+        assertEquals(error.propertyPath.toString(), "store.body.stack")
         assertEquals(error.message, "Invalid Stack List")
     }
 
     @Test
-    fun shouldNotStoreUserWithScoreGreaterThen100StackValidationError() {
+    fun `should not store user with level greater then 100 stack validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
             "Felipe",
             validBirthDate,
-            listOf(StackDTO("NodeJS", 77), StackDTO("Swift", 999))
+            mutableSetOf(StackDTO("NodeJS", 77), StackDTO("Swift", 999))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -146,18 +148,18 @@ class UserControllerUnitTest {
 
         assertNotNull(error)
         assertEquals(error.constraintDescriptor.annotation.annotationClass.toString(), "class com.kotlinspring.crudkotlinpoc.decorators.ValidStackList")
-        assertEquals(error.propertyPath.toString(), "store.body.stackDTO")
+        assertEquals(error.propertyPath.toString(), "store.body.stack")
         assertEquals(error.message, "Invalid Stack List")
     }
 
     @Test
-    fun shouldNotStoreUserWithScoreLowerThen1StackValidationError() {
+    fun `should not store user with level lower then 1 stack validation error`() {
         val userDTO = UserDTO(
             null,
             "V",
             "Felipe",
             validBirthDate,
-            listOf(StackDTO("NodeJS", 0))
+            mutableSetOf(StackDTO("NodeJS", 0))
         )
 
         every { userServiceMock.create(any()) } returns userDTO.copy(id = "aaa")
@@ -167,13 +169,14 @@ class UserControllerUnitTest {
 
         assertNotNull(error)
         assertEquals(error.constraintDescriptor.annotation.annotationClass.toString(), "class com.kotlinspring.crudkotlinpoc.decorators.ValidStackList")
-        assertEquals(error.propertyPath.toString(), "store.body.stackDTO")
+        assertEquals(error.propertyPath.toString(), "store.body.stack")
         assertEquals(error.message, "Invalid Stack List")
     }
+
     @Test
-    fun shouldRetrieveUserWithSuccess() {
+    fun `should retrieve user with success`() {
         val id = "ID_LEGAL_123"
-        val userDTO = UserDTO(id, "v", "Felipe", validBirthDate, listOf(StackDTO("NodeJS", 99), StackDTO("JS", 100)))
+        val userDTO = UserDTO(id, "v", "Felipe", validBirthDate, mutableSetOf(StackDTO("NodeJS", 99), StackDTO("JS", 100)))
 
         every { userServiceMock.find(any()) } returns userDTO
 

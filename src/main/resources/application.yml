@@ -1,9 +1,14 @@
 spring:
+  application:
+    name: crud-kotlin-poc
+  jackson:
+    property-naming-strategy: SNAKE_CASE
   datasource:
     driverClassName: oracle.jdbc.OracleDriver
     url: jdbc:oracle:thin:@localhost:1521:xe
     username: system
     password: welcome123
   jpa:
+    show-sql: true
     hibernate:
       ddl-auto: create-drop
