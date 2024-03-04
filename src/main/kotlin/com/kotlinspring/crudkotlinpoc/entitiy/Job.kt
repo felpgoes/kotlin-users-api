@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.sql.Clob
 
 @Entity
-@Table
+@Table(name = "jobs")
 data class Job(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,5 +24,11 @@ data class Job(
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-    val requirements: Set<JobRequirement> = mutableSetOf()
-)
+    val requirements: MutableSet<JobRequirement> = mutableSetOf()
+) {
+    override fun hashCode(): Int {
+        if (!id.isNullOrEmpty()) return id.hashCode()
+
+        return super.hashCode()
+    }
+}
