@@ -49,3 +49,12 @@ docker container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcom
 - [x] Substituir `exchange` por `testRestTemplate.[METHOD]`
 - [x] Fazer a validação das Collections com `assertThat` ao invés de multiplos usos do `assertEquals`
 
+## Etapa 3
+
+- [ ] Desenvolver Crud de Vagas de Emprego
+- [ ] Implementar endpoint de match por vaga (com paginação)
+- [ ] Implementar endpoint de match por usuário (com paginação)
+- [ ] Criar entidade Entrevista
+- [ ] Implementar endpoint de criação de entrevista
+- [ ] Integrar Kafka e Avro
+- [ ] Implementar testes unitarios e de integração (Minimo de 85%)
