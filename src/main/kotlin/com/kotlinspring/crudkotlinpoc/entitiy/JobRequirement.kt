@@ -3,7 +3,7 @@ package com.kotlinspring.crudkotlinpoc.entitiy
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "job_requirements")
+@Table(name = "jobs_requirements", uniqueConstraints = [UniqueConstraint(columnNames = ["stack", "job_id"])])
 data class JobRequirement(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -12,10 +12,10 @@ data class JobRequirement(
     @Column(length = 32)
     val stack: String,
 
-    @Column(nullable = false, columnDefinition = "TINYINT")
+    @Column(nullable = false, columnDefinition = "number(3, 0) CHECK (min > 0 AND min <= 100)")
     val min: Int,
 
-    @Column(nullable = true, columnDefinition = "TINYINT")
+    @Column(nullable = true, columnDefinition = "number(3, 0) CHECK (max > 0 AND max <= 100)")
     val max: Int?,
 
     @ManyToOne(fetch = FetchType.LAZY)
