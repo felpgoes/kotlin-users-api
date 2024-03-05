@@ -13,5 +13,7 @@ fun Job.toDTO(): JobDTO {
         JobRequirementDTO(it.stack, level)
     }
 
-    return JobDTO(this.id, this.name, this.description.toString(), this.salary, requirements.toMutableSet())
+    val description = this.description.getSubString(1, this.description.length().toInt())
+
+    return JobDTO(this.id, this.name, description, this.salary, requirements.toMutableSet())
 }
