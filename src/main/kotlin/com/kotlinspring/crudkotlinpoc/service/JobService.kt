@@ -40,18 +40,18 @@ class JobService (private val jobRepository: JobRepository) {
             )
         }
 
-        val users = jobRepository
+        val jobs = jobRepository
             .findAll(pageRequest)
             .map { it.toDTO() }
 
         return PaginationDTO(
             PaginationResponse(
-                users.content,
-                users.pageable.pageNumber,
-                users.pageable.pageSize,
+                jobs.content,
+                jobs.pageable.pageNumber,
+                jobs.pageable.pageSize,
                 total
             ),
-            users.hasNext()
+            jobs.hasNext()
         )
     }
 

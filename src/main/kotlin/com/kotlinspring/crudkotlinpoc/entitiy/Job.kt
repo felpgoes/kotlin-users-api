@@ -13,8 +13,8 @@ data class Job(
     @Column(nullable = false, length = 500)
     val name: String,
 
-    @Column(nullable = false)
-    val description: Clob,
+    @Column(nullable = true)
+    val description: Clob?,
 
     @Column(nullable = false)
     val salary: Int,
