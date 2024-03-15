@@ -19,13 +19,14 @@ class MatchUsersService(
 ) : MatchServiceInterface<UserDTO, JobDTO> {
 
     override fun findByMatch(id: String, pageRequest: PageRequest): Page<JobDTO> {
-        val user = userRepository
-            .findById(id)
-            .orElseThrow { UserNotFoundException(id) }
+//        val user = userRepository
+//            .findById(id)
+//            .orElseThrow { UserNotFoundException(id) }
 
-        val jobs = jobRepository.getJobsByUserStacks(user, pageRequest)
+        val jobIds = jobRepository.getMatchedJobsIdByUserId(id)
+        val jobs2 = jobRepository.findAllJobsByIdIn(jobIds, pageRequest)
 
-        return jobs.map { it.toDTO() }
+        return jobs2.map { it.toDTO() }
     }
 
     override fun count(): Long = jobRepository.count()

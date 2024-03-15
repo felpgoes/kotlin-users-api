@@ -21,11 +21,21 @@ class JobRepositoryCustomImpl(private val entityManager: EntityManager): JobRepo
 
     private fun searchBetweenLevel (stack: List<Stack>, id: String): Specification <Job> {
 
+//        SELECT jb.id, count(jb.id), count(us.id)
+//        FROM JOBS_REQUIREMENTS jr
+//        LEFT JOIN USER_STACKS us ON us.SCORE >= jr.MIN AND us.NAME = jr.STACK AND us.SCORE <= (CASE WHEN jr.MAX IS NOT NULL THEN jr.MAX ELSE us.SCORE END)
+//        AND us.USER_ID = 'e73eacdd-7b44-4432-ae7c-747d824a2991'
+//        INNER JOIN JOBS jb ON jb.id = jr.JOB_ID
+//                LEFT JOIN users u ON u.id = us.USER_ID
+//                HAVING count(jb.id) = count(us.id)
+//        GROUP BY jb.id
+//        ORDER BY jb.id
+
         return Specification <Job> { root, _, cb ->
             val predicates = mutableListOf<Predicate>()
 
             val jobRequirementJoin = root.join<Job, JobRequirement>("requirements", JoinType.LEFT)
-
+//            val jobRequirementJoin = root.join<Job, JobRequirement>("requirements", JoinType.LEFT)
 
             stack.forEach {
                 val stackPredicate = cb.and(
