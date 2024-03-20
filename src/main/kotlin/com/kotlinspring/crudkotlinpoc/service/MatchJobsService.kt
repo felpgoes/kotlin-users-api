@@ -3,7 +3,6 @@ package com.kotlinspring.crudkotlinpoc.service
 import com.kotlinspring.crudkotlinpoc.dto.*
 import com.kotlinspring.crudkotlinpoc.exceptions.JobNotFoundException
 import com.kotlinspring.crudkotlinpoc.factory.matchFactory.MatchServiceInterface
-import com.kotlinspring.crudkotlinpoc.mappers.toDTO
 import com.kotlinspring.crudkotlinpoc.repository.JobRepository
 import com.kotlinspring.crudkotlinpoc.repository.UserRepository
 import org.springframework.data.domain.Page
@@ -17,12 +16,12 @@ class MatchJobsService(
 ): MatchServiceInterface<JobDTO, UserDTO> {
 
     override fun findByMatch(id: String, pageRequest: PageRequest): Page<UserDTO> {
-        val job = jobRepository
+        jobRepository
             .findById(id)
             .orElseThrow { JobNotFoundException(id) }
 
         return userRepository
-            .findAll(pageRequest)
+            .getMatchedUsersByJobId(id, pageRequest)
             .map { user ->
                 val stack = user.stack.map { st -> StackDTO(st.name, st.level) }
                 UserDTO(user.id, user.nick, user.name, user.birthDate, stack.toMutableSet())

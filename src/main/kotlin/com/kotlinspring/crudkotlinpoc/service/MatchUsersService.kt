@@ -6,10 +6,8 @@ import com.kotlinspring.crudkotlinpoc.factory.matchFactory.MatchServiceInterface
 import com.kotlinspring.crudkotlinpoc.mappers.toDTO
 import com.kotlinspring.crudkotlinpoc.repository.JobRepository
 import com.kotlinspring.crudkotlinpoc.repository.UserRepository
-import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,14 +17,13 @@ class MatchUsersService(
 ) : MatchServiceInterface<UserDTO, JobDTO> {
 
     override fun findByMatch(id: String, pageRequest: PageRequest): Page<JobDTO> {
-//        val user = userRepository
-//            .findById(id)
-//            .orElseThrow { UserNotFoundException(id) }
+        userRepository
+            .findById(id)
+            .orElseThrow { UserNotFoundException(id) }
 
-        val jobIds = jobRepository.getMatchedJobsIdByUserId(id)
-        val jobs2 = jobRepository.findAllJobsByIdIn(jobIds, pageRequest)
-
-        return jobs2.map { it.toDTO() }
+        return jobRepository
+            .getMatchedJobsIdByUserId(id, pageRequest)
+            .map { it.toDTO() }
     }
 
     override fun count(): Long = jobRepository.count()
