@@ -5,7 +5,6 @@ import com.kotlinspring.crudkotlinpoc.entitiy.JobRequirement
 import com.kotlinspring.crudkotlinpoc.entitiy.Stack
 import com.kotlinspring.crudkotlinpoc.entitiy.User
 import jakarta.persistence.EntityManager
-import jakarta.persistence.criteria.CriteriaBuilder
 import jakarta.persistence.criteria.JoinType
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.Page
