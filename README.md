@@ -49,10 +49,10 @@ docker container create -it --name oracle-test -p 1521:1521 -e ORACLE_PWD=welcom
 
 ## Etapa 3
 
-- [ ] Desenvolver Crud de Vagas de Emprego
-- [ ] Implementar endpoint de match por vaga (com paginação)
-- [ ] Implementar endpoint de match por usuário (com paginação)
-- [ ] Criar entidade Entrevista
-- [ ] Implementar endpoint de criação de entrevista
+- [x] Desenvolver Crud de Vagas de Emprego
+- [x] Implementar endpoint de match por vaga (com paginação)
+- [x] Implementar endpoint de match por usuário (com paginação)
+- [x] Criar entidade Entrevista
+- [x] Implementar endpoint de criação de entrevista
 - [ ] Integrar Kafka e Avro
 - [ ] Implementar testes unitarios e de integração (Minimo de 85%)
