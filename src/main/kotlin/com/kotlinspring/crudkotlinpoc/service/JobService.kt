@@ -64,7 +64,6 @@ class JobService (private val jobRepository: JobRepository) {
 
     fun update(jobId: String, body: JobDTO): JobDTO {
 
-        // TESTAR
         val oldJob = jobRepository
             .findById(jobId)
             .orElseThrow { JobNotFoundException(jobId) }
